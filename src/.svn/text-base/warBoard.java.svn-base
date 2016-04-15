@@ -1,0 +1,160 @@
+import item.Armor;
+import item.HealthPotion;
+import item.ItemExceptionAttackPts;
+import item.ItemExceptionDefensePts;
+import item.ItemExceptionName;
+import item.ItemExceptionPrice;
+import item.ItemExceptionRange;
+import item.ItemExceptionRestorePts;
+import item.ItemExceptionRevivePts;
+import item.RevivePotion;
+import item.Weapon;
+import main.Board;
+import main.Colors;
+import main.Team;
+import character.Fighter;
+import character.Ranger;
+
+public class warBoard {
+
+	/**
+	 * Main method
+	 */
+	public static void main(String args[]) {
+		
+		String charNames[] = {"Bishop", "Horse", "Tower"};
+		
+		// creating teams
+		Team caaso = new Team("Caaso", Colors.YELLOW);
+		Team federal = new Team("Federal", Colors.RED);
+
+		// creating characters
+		
+		Fighter bishop = null;
+		try {
+			bishop = new Fighter(charNames[0], 8);
+		}catch (NullPointerException e){
+			e.printStackTrace();
+		}
+		Fighter horse = new Fighter(charNames[1], 9);
+		Ranger tower = new Ranger(charNames[2], 7);
+
+		//bishop.setSpeed(35);
+		//tower.setDexterity(40);
+		//horse.setStrength(45);
+		
+		// creating items
+		Armor shield = null;		
+		try {
+			shield = new Armor("Shield", 4.0, 10);
+		} catch (ItemExceptionPrice e) {
+			e.printLog();
+		} catch (ItemExceptionName e) {
+			e.printLog();
+		} catch (ItemExceptionDefensePts e) {
+			e.printLog();
+		}
+		
+		Weapon sword = null;		
+		try {
+			sword = new Weapon("Sword", 4.0, 10, 3);
+		} catch (ItemExceptionPrice e) {
+			e.printLog();
+		} catch (ItemExceptionName e) {
+			e.printLog();
+		} catch (ItemExceptionAttackPts e) {
+			e.printLog();
+		} catch (ItemExceptionRange e) {
+			e.printLog();
+		}
+		
+		RevivePotion life = null;
+		try {
+			life = new RevivePotion("Life", 4.0, 50);
+		} catch (ItemExceptionPrice e) {
+			e.printLog();
+		} catch (ItemExceptionName e) {
+			e.printLog();
+		} catch (ItemExceptionRevivePts e) {
+			e.printLog();
+		}
+		
+		HealthPotion potion = null;
+		try {
+			potion = new HealthPotion("Potion", 4.0, 30);
+		} catch (ItemExceptionPrice e) {
+			e.printLog();
+		} catch (ItemExceptionName e) {
+			e.printLog();
+		} catch (ItemExceptionRestorePts e) {
+			e.printLog();
+		}
+
+		// entering items
+		bishop.addItem(0, new Armor(shield));
+		bishop.addItem(1, new Weapon(sword));
+		bishop.addItem(2, new HealthPotion(potion));
+		bishop.setConsumable(new RevivePotion(life));
+
+		tower.addItem(0, new Armor(shield));
+		tower.addItem(1, new Weapon(sword));
+		tower.addItem(2, new RevivePotion(life));
+		tower.setConsumable(new HealthPotion(potion));
+
+		horse.addItem(0, new Armor(shield));
+		horse.addItem(1, new Weapon(sword));
+		horse.addItem(2, new RevivePotion(life));
+		horse.setConsumable(new HealthPotion(potion));
+
+		// creating board
+		Board board = new Board(6, 5);
+
+		// entering teams
+		board.addTeam(federal.getColor(), federal);
+		board.addTeam(caaso.getColor(), caaso);
+
+		// entering characters
+		board.getTeam(Colors.YELLOW).addCharacter(new Fighter(bishop));
+		board.getTeam(Colors.YELLOW).addCharacter(new Ranger(tower));
+		board.getTeam(Colors.YELLOW).addCharacter(new Fighter(horse));
+		
+		board.getTeam(Colors.RED).addCharacter(new Fighter(bishop));
+		board.getTeam(Colors.RED).addCharacter(new Ranger(tower));
+		board.getTeam(Colors.RED).addCharacter(new Fighter(horse));
+
+		// setting the positions
+		board.setCharacterPosition(1, Colors.YELLOW, bishop);
+		board.setCharacterPosition(3, Colors.YELLOW, horse);
+		board.setCharacterPosition(5, Colors.YELLOW, tower);
+		
+		board.setCharacterPosition(2, Colors.RED, bishop);
+		board.setCharacterPosition(8, Colors.RED, horse);
+		board.setCharacterPosition(25, Colors.RED, tower);
+
+		// attacking
+		for (int i = 0; i < charNames.length ; i++) {
+			for (int j = 0; j < charNames.length ; j++) {
+				board.attack(board.getTeam(Colors.YELLOW).searchChar(charNames[i]),
+					board.getTeam(Colors.RED).searchChar(charNames[j]));
+			}
+		}
+		
+		// using a consumable item
+		board.getTeam(Colors.RED).searchChar("Horse").useConsumable(
+				board.getTeam(Colors.RED).searchChar("Bishop"));
+		
+		// attacking
+		for (int i = 0; i < charNames.length ; i++) {
+			for (int j = 0; j < charNames.length ; j++) {
+				board.attack(board.getTeam(Colors.RED).searchChar(charNames[i]),
+					board.getTeam(Colors.YELLOW).searchChar(charNames[j]));
+			}
+		}
+		
+		// same-team attack
+		board.attack(board.getTeam(Colors.YELLOW).searchChar(charNames[0]),
+				board.getTeam(Colors.YELLOW).searchChar(charNames[0]));
+		
+	}
+	
+}
